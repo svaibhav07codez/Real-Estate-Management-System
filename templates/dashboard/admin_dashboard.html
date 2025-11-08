@@ -1,0 +1,154 @@
+<!-- ===================================== -->
+<!-- FILE 3: templates/dashboard/admin_dashboard.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="fw-bold mb-4">
+        <i class="bi bi-shield-check"></i> Admin Dashboard
+    </h1>
+
+    <!-- System Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-building" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                    <h3 class="mt-2">{{ total_properties }}</h3>
+                    <p class="text-muted mb-0">Total Properties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people" style="font-size: 2rem; color: var(--success-color);"></i>
+                    <h3 class="mt-2">{{ total_users }}</h3>
+                    <p class="text-muted mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-briefcase" style="font-size: 2rem; color: var(--warning-color);"></i>
+                    <h3 class="mt-2">{{ total_agents }}</h3>
+                    <p class="text-muted mb-0">Active Agents</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-cash-stack" style="font-size: 2rem; color: var(--accent-color);"></i>
+                    <h3 class="mt-2">${{ total_revenue|floatformat:0 }}</h3>
+                    <p class="text-muted mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/" class="btn btn-primary me-2">
+                        <i class="bi bi-gear"></i> Django Admin
+                    </a>
+                    <a href="{% url 'analytics' %}" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-graph-up"></i> View Analytics
+                    </a>
+                    <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-building"></i> All Properties
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Properties -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Properties</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Agent</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Listed Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for property in recent_properties %}
+                                <tr>
+                                    <td>{{ property.title|truncatewords:5 }}</td>
+                                    <td>{{ property.agent.user.first_name }} {{ property.agent.user.last_name }}</td>
+                                    <td>${{ property.price|floatformat:0 }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if property.status == 'available' %}success{% else %}secondary{% endif %}">
+                                            {{ property.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ property.created_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Recent Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Type</th>
+                                    <th>Final Price</th>
+                                    <th>Commission</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                <tr>
+                                    <td>{{ transaction.property.title|truncatewords:5 }}</td>
+                                    <td>{{ transaction.get_transaction_type_display }}</td>
+                                    <td>${{ transaction.final_price|floatformat:0 }}</td>
+                                    <td>${{ transaction.commission_amount|floatformat:0 }}</td>
+                                    <td>{{ transaction.transaction_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

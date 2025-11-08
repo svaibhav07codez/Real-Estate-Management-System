@@ -1,0 +1,188 @@
+<!-- ===================================== -->
+<!-- FILE 1: templates/dashboard/client_dashboard.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Client Dashboard - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="fw-bold">
+                <i class="bi bi-speedometer2"></i> Welcome, {{ user.first_name }}!
+            </h1>
+            <p class="text-muted">Manage your property search and appointments</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'client_profile_update' %}" class="btn btn-outline-primary">
+                <i class="bi bi-gear"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Profile Summary Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-person-badge"></i> Your Profile</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Budget Range:</strong><br>
+                            <span class="text-muted">
+                                {% if client.budget_min and client.budget_max %}
+                                    ${{ client.budget_min|floatformat:0 }} - ${{ client.budget_max|floatformat:0 }}
+                                {% else %}
+                                    Not set
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Looking For:</strong><br>
+                            <span class="badge bg-primary">{{ client.get_looking_for_display }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Preferred Location:</strong><br>
+                            <span class="text-muted">{{ client.preferred_location|default:"Not specified" }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Contact Method:</strong><br>
+                            <span class="text-muted">{{ client.get_preferred_contact_method_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                    <h3 class="mt-2">{{ appointments.count }}</h3>
+                    <p class="text-muted mb-0">Appointments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-star" style="font-size: 2rem; color: var(--warning-color);"></i>
+                    <h3 class="mt-2">{{ reviews.count }}</h3>
+                    <p class="text-muted mb-0">Reviews Written</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-heart" style="font-size: 2rem; color: var(--accent-color);"></i>
+                    <h3 class="mt-2">{{ recommended_properties.count }}</h3>
+                    <p class="text-muted mb-0">Recommended</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Your Appointments</h5>
+                        <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Date & Time</th>
+                                    <th>Agent</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'property_detail' appointment.property.property_id %}" class="text-decoration-none">
+                                            {{ appointment.property.title|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td>{{ appointment.appointment_date|date:"M d, Y - g:i A" }}</td>
+                                    <td>{{ appointment.agent.user.first_name }} {{ appointment.agent.user.last_name }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                            {{ appointment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'appointment_update' appointment.appointment_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No appointments scheduled yet. Browse properties to schedule viewings!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Properties -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-house-heart"></i> Recommended for You</h5>
+                        <a href="{% url 'property_list' %}" class="btn btn-sm btn-outline-primary">Browse All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if recommended_properties %}
+                    <div class="row g-3">
+                        {% for property in recommended_properties %}
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ property.title|truncatewords:5 }}</h6>
+                                    <p class="text-primary fw-bold mb-2">${{ property.price|floatformat:0 }}</p>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-geo-alt"></i> {{ property.location.city }}, {{ property.location.state }}
+                                    </p>
+                                    <p class="text-muted small mb-3">
+                                        {{ property.bedrooms }} beds • {{ property.bathrooms }} baths
+                                    </p>
+                                    <a href="{% url 'property_detail' property.property_id %}" class="btn btn-sm btn-primary w-100">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">Update your profile preferences to see personalized recommendations!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

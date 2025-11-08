@@ -1,0 +1,231 @@
+<!-- ===================================== -->
+<!-- FILE 2: templates/properties/property_detail.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}{{ property.title }} - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Listings
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Images and Details -->
+        <div class="col-lg-8">
+            <!-- Property Images -->
+            <div class="card mb-4">
+                {% if images %}
+                <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in images %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image_url }}" class="d-block w-100" alt="{{ image.caption }}" style="height: 400px; object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if images.count > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-house-door" style="font-size: 6rem; color: white; opacity: 0.5;"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Property Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">{{ property.title }}</h2>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-geo-alt-fill"></i> {{ property.location.street_address }}, {{ property.location.city }}, {{ property.location.state }} {{ property.location.zip_code }}
+                    </p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <h5 class="text-primary">${{ property.price|floatformat:0 }}</h5>
+                            <small class="text-muted">
+                                {% if property.listing_type == 'rent' %}/month{% endif %}
+                            </small>
+                        </div>
+                        <div class="col-md-3">
+                            <h5>{{ property.bedrooms }}</h5>
+                            <small class="text-muted">Bedrooms</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h5>{{ property.bathrooms }}</h5>
+                            <small class="text-muted">Bathrooms</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h5>{{ property.square_feet|default:"N/A" }}</h5>
+                            <small class="text-muted">Sq Ft</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-3">Description</h5>
+                    <p>{{ property.description|default:"No description available." }}</p>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-3">Property Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Property Type:</strong> {{ property.property_type.type_name }}</li>
+                                <li class="mb-2"><strong>Listing Type:</strong> {{ property.get_listing_type_display }}</li>
+                                <li class="mb-2"><strong>Status:</strong> 
+                                    <span class="badge bg-{% if property.status == 'available' %}success{% elif property.status == 'sold' %}danger{% else %}warning{% endif %}">
+                                        {{ property.get_status_display }}
+                                    </span>
+                                </li>
+                                <li class="mb-2"><strong>Year Built:</strong> {{ property.year_built|default:"N/A" }}</li>
+                                <li class="mb-2"><strong>Lot Size:</strong> {{ property.lot_size|default:"N/A" }} acres</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Parking Spaces:</strong> {{ property.parking_spaces }}</li>
+                                <li class="mb-2"><strong>Garage:</strong> {% if property.has_garage %}<i class="bi bi-check-circle-fill text-success"></i> Yes{% else %}<i class="bi bi-x-circle-fill text-danger"></i> No{% endif %}</li>
+                                <li class="mb-2"><strong>Pool:</strong> {% if property.has_pool %}<i class="bi bi-check-circle-fill text-success"></i> Yes{% else %}<i class="bi bi-x-circle-fill text-danger"></i> No{% endif %}</li>
+                                <li class="mb-2"><strong>Garden:</strong> {% if property.has_garden %}<i class="bi bi-check-circle-fill text-success"></i> Yes{% else %}<i class="bi bi-x-circle-fill text-danger"></i> No{% endif %}</li>
+                                <li class="mb-2"><strong>Listed Date:</strong> {{ property.listed_date|date:"M d, Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-star"></i> Reviews ({{ reviews.count }})</h5>
+                    {% if avg_rating %}
+                    <div class="text-warning">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}
+                            <i class="bi bi-star-fill"></i>
+                            {% else %}
+                            <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="text-muted">{{ avg_rating|floatformat:1 }} average</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ review.client.user.first_name }} {{ review.client.user.last_name }}</strong>
+                                <small class="text-muted">{{ review.review_date|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="text-warning mb-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                    <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="mb-0">{{ review.review_text }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No reviews yet. Be the first to review!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Agent Info and Actions -->
+        <div class="col-lg-4">
+            <!-- Agent Info Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-person-badge"></i> Listed By</h5>
+                    <h4>{{ property.agent.user.first_name }} {{ property.agent.user.last_name }}</h4>
+                    <p class="text-muted mb-2">{{ property.agent.agency_name|default:"Independent Agent" }}</p>
+                    <p class="mb-2">
+                        <i class="bi bi-star-fill text-warning"></i> {{ property.agent.rating|floatformat:1 }} Rating
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-telephone"></i> {{ property.agent.user.phone|default:"Not available" }}
+                    </p>
+                    <p class="mb-3">
+                        <i class="bi bi-envelope"></i> {{ property.agent.user.email }}
+                    </p>
+                    <p class="mb-0 small text-muted">
+                        {{ property.agent.years_experience }} years experience • {{ property.agent.total_sales }} sales
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Interested?</h5>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user.user_type == 'client' and property.status == 'available' %}
+                        <a href="{% url 'appointment_create' property.property_id %}" class="btn btn-primary w-100 mb-2">
+                            <i class="bi bi-calendar-plus"></i> Schedule Viewing
+                        </a>
+                        <a href="{% url 'review_create' property.property_id %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-star"></i> Write Review
+                        </a>
+                        {% elif user.user_type == 'agent' %}
+                            {% if property.agent.user == user %}
+                            <a href="{% url 'property_update' property.property_id %}" class="btn btn-warning w-100 mb-2">
+                                <i class="bi bi-pencil"></i> Edit Property
+                            </a>
+                            <a href="{% url 'transaction_create' property.property_id %}" class="btn btn-success w-100 mb-2">
+                                <i class="bi bi-cash-coin"></i> Create Transaction
+                            </a>
+                            <a href="{% url 'property_delete' property.property_id %}" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-trash"></i> Delete Property
+                            </a>
+                            {% else %}
+                            <p class="text-muted text-center mb-0">This property is managed by another agent.</p>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Login to Schedule Viewing
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-person-plus"></i> Create Account
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Property Stats -->
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Property Information</h6>
+                    <small class="text-muted">
+                        <p class="mb-1"><strong>Property ID:</strong> #{{ property.property_id }}</p>
+                        <p class="mb-1"><strong>Listed:</strong> {{ property.listed_date|date:"M d, Y" }}</p>
+                        <p class="mb-0"><strong>Updated:</strong> {{ property.updated_at|date:"M d, Y" }}</p>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

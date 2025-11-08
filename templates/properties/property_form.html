@@ -1,0 +1,194 @@
+<!-- ===================================== -->
+<!-- FILE 3: templates/properties/property_form.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ action }} Property - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-{% if action == 'Create' %}plus-circle{% else %}pencil{% endif %}"></i>
+                        {{ action }} Property
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <h5 class="mb-3"><i class="bi bi-info-circle"></i> Basic Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">Property Title *</label>
+                                {{ form.title }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Location Information -->
+                        <h5 class="mb-3"><i class="bi bi-geo-alt"></i> Location</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.street_address.id_for_label }}" class="form-label">Street Address *</label>
+                                {{ form.street_address }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-5">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">City *</label>
+                                {{ form.city }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.state.id_for_label }}" class="form-label">State *</label>
+                                {{ form.state }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.zip_code.id_for_label }}" class="form-label">Zip Code *</label>
+                                {{ form.zip_code }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Pricing & Type -->
+                        <h5 class="mb-3"><i class="bi bi-currency-dollar"></i> Pricing & Type</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.price.id_for_label }}" class="form-label">Price *</label>
+                                {{ form.price }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.listing_type.id_for_label }}" class="form-label">Listing Type *</label>
+                                {{ form.listing_type }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.property_type.id_for_label }}" class="form-label">Property Type *</label>
+                                {{ form.property_type }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Property Details -->
+                        <h5 class="mb-3"><i class="bi bi-house"></i> Property Details</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="{{ form.bedrooms.id_for_label }}" class="form-label">Bedrooms *</label>
+                                {{ form.bedrooms }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.bathrooms.id_for_label }}" class="form-label">Bathrooms *</label>
+                                {{ form.bathrooms }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.square_feet.id_for_label }}" class="form-label">Square Feet</label>
+                                {{ form.square_feet }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.lot_size.id_for_label }}" class="form-label">Lot Size (acres)</label>
+                                {{ form.lot_size }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.year_built.id_for_label }}" class="form-label">Year Built</label>
+                                {{ form.year_built }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.parking_spaces.id_for_label }}" class="form-label">Parking Spaces</label>
+                                {{ form.parking_spaces }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.listed_date.id_for_label }}" class="form-label">Listed Date *</label>
+                                {{ form.listed_date }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Features -->
+                        <h5 class="mb-3"><i class="bi bi-check2-square"></i> Features</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.has_garage }}
+                                    <label class="form-check-label" for="{{ form.has_garage.id_for_label }}">
+                                        Has Garage
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.has_pool }}
+                                    <label class="form-check-label" for="{{ form.has_pool.id_for_label }}">
+                                        Has Pool
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.has_garden }}
+                                    <label class="form-check-label" for="{{ form.has_garden.id_for_label }}">
+                                        Has Garden
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Status -->
+                        <h5 class="mb-3"><i class="bi bi-flag"></i> Status</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Property Status *</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <h6>Please correct the following errors:</h6>
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'agent_dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ action }} Property
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

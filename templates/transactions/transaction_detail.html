@@ -1,0 +1,119 @@
+<!-- ===================================== -->
+<!-- FILE 8: templates/transactions/transaction_detail.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Transaction Details - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Transactions
+            </a>
+            <h1 class="fw-bold">
+                <i class="bi bi-receipt"></i> Transaction Details
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Transaction #{{ transaction.transaction_id }}</h5>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">{{ transaction.property.title }}</h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Transaction Type:</strong>
+                                <span class="badge bg-{% if transaction.transaction_type == 'sale' %}primary{% else %}success{% endif %}">
+                                    {{ transaction.get_transaction_type_display }}
+                                </span>
+                            </p>
+                            <p class="mb-2">
+                                <strong>Payment Status:</strong>
+                                <span class="badge bg-{% if transaction.payment_status == 'completed' %}success{% else %}warning{% endif %}">
+                                    {{ transaction.get_payment_status_display }}
+                                </span>
+                            </p>
+                            <p class="mb-2">
+                                <strong>Transaction Date:</strong> {{ transaction.transaction_date|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Final Price:</strong> 
+                                <span class="text-success fs-5">${{ transaction.final_price|floatformat:0 }}</span>
+                            </p>
+                            <p class="mb-2">
+                                <strong>Commission:</strong> 
+                                <span class="text-primary">${{ transaction.commission_amount|floatformat:0 }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if transaction.lease_start_date %}
+                    <hr>
+                    <h5>Lease Information</h5>
+                    <p class="mb-1"><strong>Lease Start:</strong> {{ transaction.lease_start_date|date:"M d, Y" }}</p>
+                    <p class="mb-0"><strong>Lease End:</strong> {{ transaction.lease_end_date|date:"M d, Y" }}</p>
+                    {% endif %}
+
+                    {% if transaction.notes %}
+                    <hr>
+                    <h5>Notes</h5>
+                    <p>{{ transaction.notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Property Info -->
+            <div class="card mb-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Property Information</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Address:</strong><br>
+                        {{ transaction.property.location.street_address }}<br>
+                        {{ transaction.property.location.city }}, {{ transaction.property.location.state }}
+                    </p>
+                    <a href="{% url 'property_detail' transaction.property.property_id %}" class="btn btn-sm btn-outline-primary w-100">
+                        View Property
+                    </a>
+                </div>
+            </div>
+
+            <!-- Client Info -->
+            <div class="card mb-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Client</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Name:</strong> {{ transaction.client.user.first_name }} {{ transaction.client.user.last_name }}</p>
+                    <p class="mb-0"><strong>Email:</strong> {{ transaction.client.user.email }}</p>
+                </div>
+            </div>
+
+            <!-- Agent Info -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Agent</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Name:</strong> {{ transaction.agent.user.first_name }} {{ transaction.agent.user.last_name }}</p>
+                    <p class="mb-1"><strong>Agency:</strong> {{ transaction.agent.agency_name|default:"Independent" }}</p>
+                    <p class="mb-0"><strong>Email:</strong> {{ transaction.agent.user.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

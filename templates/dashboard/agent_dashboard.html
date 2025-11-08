@@ -1,0 +1,217 @@
+<!-- ===================================== -->
+<!-- FILE 2: templates/dashboard/agent_dashboard.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Agent Dashboard - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="fw-bold">
+                <i class="bi bi-speedometer2"></i> Agent Dashboard
+            </h1>
+            <p class="text-muted">Welcome back, {{ user.first_name }}! Manage your listings and clients.</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'property_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Property
+            </a>
+            <a href="{% url 'agent_profile_update' %}" class="btn btn-outline-primary">
+                <i class="bi bi-gear"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Agent Info Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>Agency</h6>
+                            <h5>{{ agent.agency_name|default:"Independent" }}</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>License #</h6>
+                            <h5>{{ agent.license_number }}</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Rating</h6>
+                            <h5>
+                                <i class="bi bi-star-fill"></i> {{ agent.rating|floatformat:1 }}
+                            </h5>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Commission Rate</h6>
+                            <h5>{{ agent.commission_rate }}%</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Total Commission</h6>
+                            <h5>${{ total_commission|floatformat:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-building" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                    <h3 class="mt-2">{{ active_listings }}</h3>
+                    <p class="text-muted mb-0">Active Listings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check" style="font-size: 2rem; color: var(--warning-color);"></i>
+                    <h3 class="mt-2">{{ appointments.count }}</h3>
+                    <p class="text-muted mb-0">Appointments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-check-circle" style="font-size: 2rem; color: var(--success-color);"></i>
+                    <h3 class="mt-2">{{ agent.total_sales }}</h3>
+                    <p class="text-muted mb-0">Total Sales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-cash-stack" style="font-size: 2rem; color: var(--accent-color);"></i>
+                    <h3 class="mt-2">${{ total_commission|floatformat:0 }}</h3>
+                    <p class="text-muted mb-0">Total Commission</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Upcoming Appointments</h5>
+                        <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Client</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'property_detail' appointment.property.property_id %}">
+                                            {{ appointment.property.title|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td>{{ appointment.client.user.first_name }} {{ appointment.client.user.last_name }}</td>
+                                    <td>{{ appointment.appointment_date|date:"M d, Y - g:i A" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% else %}secondary{% endif %}">
+                                            {{ appointment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'appointment_update' appointment.appointment_id %}" class="btn btn-sm btn-outline-primary">
+                                            Update
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No upcoming appointments.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Properties -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-building"></i> Your Properties</h5>
+                        <a href="{% url 'property_create' %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus"></i> Add New
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if properties %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Price</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for property in properties %}
+                                <tr>
+                                    <td>{{ property.title|truncatewords:5 }}</td>
+                                    <td>${{ property.price|floatformat:0 }}</td>
+                                    <td>{{ property.get_listing_type_display }}</td>
+                                    <td>{{ property.location.city }}, {{ property.location.state }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if property.status == 'available' %}success{% elif property.status == 'sold' %}danger{% else %}warning{% endif %}">
+                                            {{ property.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'property_detail' property.property_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'property_update' property.property_id %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No properties listed yet. Click "Add Property" to get started!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!-- ===================================== -->
+<!-- FILE 6: templates/appointments/appointment_confirm_delete.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Cancel Appointment - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Cancel Appointment
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Are you sure you want to cancel this appointment?</h5>
+                    
+                    <div class="alert alert-warning">
+                        <p class="mb-1"><strong>Property:</strong> {{ appointment.property.title }}</p>
+                        <p class="mb-0"><strong>Date:</strong> {{ appointment.appointment_date|date:"M d, Y - g:i A" }}</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'appointment_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Keep Appointment
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Yes, Cancel It
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!-- ===================================== -->
+<!-- FILE 4: templates/appointments/appointment_form.html -->
+<!-- ===================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Schedule Appointment - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-calendar-plus"></i> Schedule Viewing Appointment
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Property Info -->
+                    <div class="alert alert-info">
+                        <h5>{{ property.title }}</h5>
+                        <p class="mb-0">
+                            <i class="bi bi-geo-alt"></i> {{ property.location.city }}, {{ property.location.state }}
+                            <br>
+                            <i class="bi bi-person-badge"></i> Agent: {{ property.agent.user.first_name }} {{ property.agent.user.last_name }}
+                        </p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.appointment_date.id_for_label }}" class="form-label">Appointment Date & Time *</label>
+                            {{ form.appointment_date }}
+                            <small class="text-muted">Select your preferred date and time for the viewing</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">Duration (minutes)</label>
+                            {{ form.duration_minutes }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes (Optional)</label>
+                            {{ form.notes }}
+                            <small class="text-muted">Any special requests or questions for the agent</small>
+                        </div>
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'property_detail' property.property_id %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Schedule Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
