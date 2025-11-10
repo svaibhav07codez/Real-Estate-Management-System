@@ -3,6 +3,8 @@
 {% block title %}Home - Real Estate DBMS{% endblock %}
 
 {% block content %}
+
+{% load static %}
 <!-- Hero Section -->
 <div class="hero-section">
     <div class="container">
@@ -22,7 +24,7 @@
                 </div>
             </div>
             <div class="col-lg-6 text-center">
-                <i class="bi bi-building" style="font-size: 15rem; opacity: 0.2;"></i>
+                <img src="{% static 'images/home.jpg' %}" alt="Real Estate" class="img-fluid rounded shadow" style="max-height: 400px;">
             </div>
         </div>
     </div>

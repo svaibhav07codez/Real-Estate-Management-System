@@ -748,6 +748,57 @@ SELECT user_id, email, username, first_name, last_name, user_type, is_superuser,
 FROM Users 
 WHERE email = 'vaibhavsankaran24@gmail.com';
 
+-- Update PropertyImages table with your new image names
+UPDATE PropertyImages SET image_url = '/static/images/prop1_exterior.jpg' WHERE property_id = 1 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/prop1_bed1.jpg' WHERE property_id = 1 AND caption = 'Modern kitchen';
+
+UPDATE PropertyImages SET image_url = '/static/images/prop2_exterior.jpg' WHERE property_id = 2 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/prop2_bed1.jpg' WHERE property_id = 2 AND caption = 'City view from balcony';
+UPDATE PropertyImages SET image_url = '/static/images/prop2_bed2.jpg' WHERE property_id = 2 AND display_order = 3;
+
+UPDATE PropertyImages SET image_url = '/static/images/prop3_exterior.jpg' WHERE property_id = 3 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/prop3_bed1.jpg' WHERE property_id = 3 AND display_order = 2;
+
+UPDATE PropertyImages SET image_url = '/static/images/apart4_exterior.jpg' WHERE property_id = 4 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/studio_interior.jpg' WHERE property_id = 4 AND display_order = 2;
+
+UPDATE PropertyImages SET image_url = '/static/images/apart5_exterior.jpg' WHERE property_id = 5 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/apart5_bed1.jpg' WHERE property_id = 5 AND display_order = 2;
+
+UPDATE PropertyImages SET image_url = '/static/images/apart6_exterior.jpg' WHERE property_id = 6 AND is_primary = TRUE;
+UPDATE PropertyImages SET image_url = '/static/images/apart6_bed.jpg' WHERE property_id = 6 AND display_order = 2;
+
+-- For properties 7-10 that don't have specific images, we can reuse some
+UPDATE PropertyImages SET image_url = '/static/images/prop1_exterior.jpg' WHERE property_id = 7;
+UPDATE PropertyImages SET image_url = '/static/images/prop2_exterior.jpg' WHERE property_id = 8;
+UPDATE PropertyImages SET image_url = '/static/images/prop3_exterior.jpg' WHERE property_id = 9;
+UPDATE PropertyImages SET image_url = '/static/images/apart5_exterior.jpg' WHERE property_id = 10;
+
+-- Property 7 (Historic Home in Waltham)
+INSERT INTO PropertyImages (property_id, image_url, caption, is_primary, display_order) VALUES
+(7, '/static/images/prop1_exterior.jpg', 'Historic Home Exterior', TRUE, 1),
+(7, '/static/images/prop1_bed1.jpg', 'Master Bedroom', FALSE, 2);
+
+-- Property 8 (Modern Townhouse in Medford)
+INSERT INTO PropertyImages (property_id, image_url, caption, is_primary, display_order) VALUES
+(8, '/static/images/prop2_exterior.jpg', 'Modern Townhouse', TRUE, 1),
+(8, '/static/images/prop2_bed1.jpg', 'Spacious Bedroom', FALSE, 2);
+
+-- Property 9 (Cozy Studio Apartment)
+INSERT INTO PropertyImages (property_id, image_url, caption, is_primary, display_order) VALUES
+(9, '/static/images/studio_interior.jpg', 'Studio Interior', TRUE, 1),
+(9, '/static/images/prop3_bed1.jpg', 'Living Space', FALSE, 2);
+
+-- Property 10 (Waterfront Property in Watertown)
+INSERT INTO PropertyImages (property_id, image_url, caption, is_primary, display_order) VALUES
+(10, '/static/images/apart5_exterior.jpg', 'Waterfront Property', TRUE, 1),
+(10, '/static/images/apart6_exterior.jpg', 'Property View', FALSE, 2);
+
+SELECT p.property_id, p.title, COUNT(pi.image_id) as image_count
+FROM Properties p
+LEFT JOIN PropertyImages pi ON p.property_id = pi.property_id
+GROUP BY p.property_id, p.title
+ORDER BY p.property_id;
 -- =====================================================
 -- END OF SCHEMA
 -- =====================================================
