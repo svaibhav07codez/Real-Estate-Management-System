@@ -296,6 +296,7 @@ Every time you want to run the application:
 4. **Access the application:**
    - Homepage: `http://127.0.0.1:8000/`
    - Admin Panel: `http://127.0.0.1:8000/admin/`
+   - Analytics Dashboard: `http://127.0.0.1:8000/analytics/`
 
 ### Stopping the Application
 
@@ -307,18 +308,21 @@ Press **Ctrl+C** in the terminal to stop the server.
 
 ### Admin Users
 - Access Django admin panel
-- View system-wide statistics
+- View system-wide statistics and analytics
+- Access comprehensive analytics dashboard
 - Manage all users, properties, and transactions
 - Monitor system performance
 - Generate analytics reports
+- View market insights and trends
 
 ### Agent Users
 - Create and manage property listings
 - Update property information and status
 - Schedule and manage appointments
 - Create transactions (sales/rentals)
-- View performance metrics
+- View performance metrics and analytics
 - Track commission earnings
+- Access analytics dashboard for market insights
 
 ### Client Users
 - Browse and search properties
@@ -428,20 +432,44 @@ Press **Ctrl+C** in the terminal to stop the server.
 - Set commission rates
 - Track performance metrics
 
-### 6. Search & Analytics
+### 6. Search & Filtering
 
 **Property Search:**
-- Keyword search
-- Multi-filter search
+- Keyword search (title, city, description)
+- Multi-filter search with:
+  - Price range (min/max)
+  - Location (city)
+  - Property type
+  - Number of bedrooms
+  - Listing type (sale/rent)
+  - Status (available, pending, sold, rented)
 - Sort by price, date, location
-- Real-time results
+- Real-time search results
 
-**Analytics Dashboard:**
-- System-wide statistics
-- Property market trends
-- Agent performance metrics
-- Commission tracking
-- Transaction reports
+### 7. Analytics Dashboard
+
+**System-wide Analytics** (Admin/Agent access):
+- **Key Metrics:**
+  - Total properties in system
+  - Available properties count
+  - Sold properties count
+  - Average property price
+- **Properties by Type:**
+  - Distribution across property types
+  - Count and percentage breakdown
+- **Geographic Analysis:**
+  - Top cities by property count
+  - City-wise distribution
+- **Price Distribution:**
+  - Average prices by location
+  - Market pricing insights
+- **Property Status Overview:**
+  - Visual breakdown of all statuses
+  - Available, pending, sold, rented counts
+- **Market Insights:**
+  - Most popular property type
+  - Most active city
+  - Market availability percentage
 
 ---
 
@@ -494,9 +522,11 @@ real_estate_project/
 │   │   ├── transaction_list.html
 │   │   ├── transaction_detail.html
 │   │   └── transaction_form.html
-│   └── reviews/                  # Review templates
-│       ├── review_form.html
-│       └── review_confirm_delete.html
+│   ├── reviews/                  # Review templates
+│   │   ├── review_form.html
+│   │   └── review_confirm_delete.html
+│   └── analytics/                # Analytics templates
+│       └── analytics.html
 ├── static/                        # Static files
 │   ├── css/                      # Custom stylesheets
 │   ├── js/                       # JavaScript files
@@ -554,6 +584,15 @@ real_estate_project/
 3. Write a review with rating
 4. View review on property page
 5. Delete review
+
+#### 5. Test Analytics Dashboard (as Admin/Agent)
+1. Login as admin or agent
+2. Navigate to Analytics page
+3. View system-wide statistics
+4. Check properties by type breakdown
+5. Review top cities data
+6. Examine price distribution
+7. Verify all metrics display correctly
 
 ### Database Verification
 
@@ -686,10 +725,13 @@ Potential improvements for the system:
    - Mortgage calculator
 
 2. **Analytics:**
-   - Market trend analysis
+   - Market trend analysis with visual representations
    - Price prediction models
-   - Agent performance dashboards
-   - Interactive charts and graphs
+   - Interactive agent performance dashboards
+   - Advanced charts and graphs using Chart.js or D3.js
+   - Historical data comparison
+   - Predictive analytics for property values
+   - Seasonal trend analysis
 
 3. **User Experience:**
    - Mobile responsive design
