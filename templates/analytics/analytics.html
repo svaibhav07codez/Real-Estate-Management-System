@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - Real Estate DBMS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="fw-bold">
+                <i class="bi bi-graph-up"></i> Analytics Dashboard
+            </h1>
+            <p class="text-muted">Comprehensive market insights and system statistics</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <i class="bi bi-building" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                    <h2 class="mt-2 mb-0">{{ total_properties }}</h2>
+                    <p class="text-muted mb-0">Total Properties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <i class="bi bi-check-circle" style="font-size: 2.5rem; color: var(--success-color);"></i>
+                    <h2 class="mt-2 mb-0">{{ available_properties }}</h2>
+                    <p class="text-muted mb-0">Available Properties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <i class="bi bi-cart-check" style="font-size: 2.5rem; color: var(--warning-color);"></i>
+                    <h2 class="mt-2 mb-0">{{ sold_properties }}</h2>
+                    <p class="text-muted mb-0">Sold Properties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <i class="bi bi-currency-dollar" style="font-size: 2.5rem; color: var(--secondary-color);"></i>
+                    <h2 class="mt-2 mb-0">${{ avg_price|floatformat:0 }}</h2>
+                    <p class="text-muted mb-0">Average Price</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Properties by Type -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Properties by Type</h5>
+                </div>
+                <div class="card-body">
+                    {% if properties_by_type %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property Type</th>
+                                    <th class="text-end">Count</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in properties_by_type %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-house-door"></i> 
+                                        {{ item.property_type__type_name|default:"Unknown" }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary">{{ item.count }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        {% widthratio item.count total_properties 100 %}%
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties by City -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Top Cities</h5>
+                </div>
+                <div class="card-body">
+                    {% if properties_by_city %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th class="text-end">Properties</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in properties_by_city %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-pin-map"></i> 
+                                        {{ item.location__city }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-success">{{ item.count }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        {% widthratio item.count total_properties 100 %}%
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Price Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center border-end">
+                            <h3 class="text-primary">${{ avg_price|floatformat:0 }}</h3>
+                            <p class="text-muted mb-0">Average Price</p>
+                        </div>
+                        <div class="col-md-3 text-center border-end">
+                            <h3 class="text-success">
+                                ${% if properties_by_city %}{{ properties_by_city.0.avg_price|default:0|floatformat:0 }}{% else %}0{% endif %}
+                            </h3>
+                            <p class="text-muted mb-0">Highest Avg by City</p>
+                        </div>
+                        <div class="col-md-3 text-center border-end">
+                            <h3 class="text-warning">{{ available_properties }}</h3>
+                            <p class="text-muted mb-0">Available Listings</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-danger">{{ sold_properties }}</h3>
+                            <p class="text-muted mb-0">Sold This Period</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Insights -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-trending-up text-success"></i> Most Popular Type
+                    </h6>
+                    {% if properties_by_type %}
+                    <h4>{{ properties_by_type.0.property_type__type_name|default:"N/A" }}</h4>
+                    <p class="text-muted mb-0">{{ properties_by_type.0.count }} properties</p>
+                    {% else %}
+                    <p class="text-muted">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-geo text-primary"></i> Most Active City
+                    </h6>
+                    {% if properties_by_city %}
+                    <h4>{{ properties_by_city.0.location__city }}</h4>
+                    <p class="text-muted mb-0">{{ properties_by_city.0.count }} properties</p>
+                    {% else %}
+                    <p class="text-muted">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-percent text-warning"></i> Market Status
+                    </h6>
+                    <h4>
+                        {% if total_properties > 0 %}
+                            {% widthratio available_properties total_properties 100 %}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h4>
+                    <p class="text-muted mb-0">Properties Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Property Status Breakdown -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Property Status Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                            </div>
+                            <h4>{{ available_properties }}</h4>
+                            <p class="text-muted small mb-0">Available</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-clock-fill text-warning" style="font-size: 2rem;"></i>
+                            </div>
+                            <h4>0</h4>
+                            <p class="text-muted small mb-0">Pending</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-x-circle-fill text-danger" style="font-size: 2rem;"></i>
+                            </div>
+                            <h4>{{ sold_properties }}</h4>
+                            <p class="text-muted small mb-0">Sold</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-house-fill text-info" style="font-size: 2rem;"></i>
+                            </div>
+                            <h4>0</h4>
+                            <p class="text-muted small mb-0">Rented</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-dash-circle-fill text-secondary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h4>0</h4>
+                            <p class="text-muted small mb-0">Off Market</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-building" style="font-size: 2rem; color: var(--primary-color);"></i>
+                            </div>
+                            <h4>{{ total_properties }}</h4>
+                            <p class="text-muted small mb-0">Total</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'property_list' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-search"></i> Browse All Properties
+                        </a>
+                        <a href="/admin/" class="btn btn-outline-secondary">
+                            <i class="bi bi-gear"></i> Django Admin
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-info">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// You can add Chart.js or other visualization libraries here in the future
+console.log('Analytics page loaded');
+</script>
+{% endblock %}
+{% endblock %}
