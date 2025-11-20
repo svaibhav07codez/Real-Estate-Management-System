@@ -727,13 +727,13 @@ INSERT INTO Users (
     updated_at,
     date_joined
 ) VALUES (
-    'vaibhavsankaran@gmail.com',
-    'sumathi71',  -- temporary password
+    'vaibhavs@gmail.com',
+    'random12',  -- temporary password
     'Vaibhav',
     'Sankaran',
     '555-0000',
     'admin',
-    'vaibhavsankaran@gmail.com',
+    'vaibhavs@gmail.com',
     TRUE,
     TRUE,
     TRUE,
