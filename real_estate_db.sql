@@ -693,7 +693,7 @@ UPDATE Users
 SET is_superuser = TRUE, 
     is_staff = TRUE,
     user_type = 'admin'
-WHERE email = 'vaibhavsankaran24@gmail.com';
+WHERE email = 'superuser@test.com';
 
 -- Add username column
 ALTER TABLE Users 
@@ -702,16 +702,9 @@ ADD COLUMN username VARCHAR(150) NULL UNIQUE AFTER email;
 -- Set username to be the same as email for existing users
 UPDATE Users SET username = email WHERE username IS NULL;
 
--- checking if user exists cos login isn't working
-USE real_estate_db;
-SELECT user_id, email, first_name, last_name, user_type, is_superuser, is_staff, is_active
-FROM Users 
-WHERE email = 'vaibhavsankaran24@gmail.com';
-
--- creating a superuser proeprly again
-USE real_estate_db;
-
 -- Create the superuser manually
+USE real_estate_db;
+
 INSERT INTO Users (
     email, 
     password_hash, 
@@ -727,13 +720,13 @@ INSERT INTO Users (
     updated_at,
     date_joined
 ) VALUES (
-    'vaibhavs@gmail.com',
-    'random12',  -- temporary password
-    'Vaibhav',
-    'Sankaran',
+    'superuser@test.com',
+    'pbkdf2_sha256$600000$aP4cdoPwEXdBCoCWrKySHA$zc8aS1ZevUYp2NKo6AyihmXgeE6RtIZBi0orkz0WrWQ=',  -- hashed password
+    'Super',
+    'User',
     '555-0000',
     'admin',
-    'vaibhavs@gmail.com',
+    'superuser@test.com',
     TRUE,
     TRUE,
     TRUE,
@@ -741,12 +734,6 @@ INSERT INTO Users (
     NOW(),
     NOW()
 ); 
-
-USE real_estate_db;
-SELECT user_id, email, username, first_name, last_name, user_type, is_superuser, is_staff, is_active, password_hash,
-       LENGTH(password_hash) as password_length
-FROM Users 
-WHERE email = 'vaibhavsankaran24@gmail.com';
 
 -- Update PropertyImages table with your new image names
 UPDATE PropertyImages SET image_url = '/static/images/prop1_exterior.jpg' WHERE property_id = 1 AND is_primary = TRUE;
