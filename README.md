@@ -214,7 +214,13 @@ python manage.py migrate
 
 This creates Django's system tables (sessions, admin, etc.).
 
-### Step 7: Create Superuser (already exists in db - username: superuser@test.com, password: admin012)
+## Step 7 is optional since we have a dummy user created for admin/superuser, client, and agent roles. Credentials are below:
+
+Superuser/admin - superuser@realestate.com, admin123
+Client - client@realestate.com, client123
+Agent - agent@realestate.com, agent123
+
+### Step 7: Create Superuser 
 
 ```bash
 python manage.py createsuperuser
