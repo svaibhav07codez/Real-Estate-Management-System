@@ -702,7 +702,11 @@ ADD COLUMN username VARCHAR(150) NULL UNIQUE AFTER email;
 -- Set username to be the same as email for existing users
 UPDATE Users SET username = email WHERE username IS NULL;
 
--- Create the superuser manually
+-- =====================================================
+-- CREATE DUMMY SUPERUSER (admin)
+-- Email: superuser@realestate.com
+-- Password: admin123
+-- =====================================================
 USE real_estate_db;
 
 INSERT INTO Users (
@@ -720,13 +724,13 @@ INSERT INTO Users (
     updated_at,
     date_joined
 ) VALUES (
-    'superuser@test.com',
-    'pbkdf2_sha256$600000$aP4cdoPwEXdBCoCWrKySHA$zc8aS1ZevUYp2NKo6AyihmXgeE6RtIZBi0orkz0WrWQ=',  -- hashed password
+    'superuser@realestate.com',
+    'pbkdf2_sha256$600000$7gHbR0pyy6QHkxqvNsBrTz$+OcvY9ba92XlKZHLNPtnNvJ0vSBxP/6DSW/geMLmQ3M=',  -- hashed password
     'Super',
     'User',
     '555-0000',
     'admin',
-    'superuser@test.com',
+    'superuser@realestate.com',
     TRUE,
     TRUE,
     TRUE,
@@ -734,6 +738,121 @@ INSERT INTO Users (
     NOW(),
     NOW()
 ); 
+
+USE real_estate_db;
+
+-- =====================================================
+-- CREATE DUMMY AGENT USER
+-- Email: agent@realestate.com
+-- Password: agent123
+-- =====================================================
+
+-- Delete if exists
+DELETE FROM Agents WHERE user_id IN (SELECT user_id FROM Users WHERE email = 'agent@realestate.com');
+DELETE FROM Users WHERE email = 'agent@realestate.com';
+
+-- Create Agent User
+INSERT INTO Users (
+    email, 
+    username,
+    password_hash, 
+    first_name, 
+    last_name, 
+    phone, 
+    user_type,
+    is_active,
+    is_superuser,
+    is_staff,
+    created_at,
+    updated_at,
+    date_joined
+) VALUES (
+    'agent@realestate.com',
+    'agent@realestate.com',
+    'pbkdf2_sha256$600000$ALxVKf1YRi4YXPvODZkWiR$Klph6b3K5PN3jj36w+kQG/BNCq24aqcU3ET1uzj4drg=',  -- password: agent123
+    'John',
+    'Agent',
+    '555-1001',
+    'agent',
+    TRUE,
+    FALSE,
+    FALSE,
+    NOW(),
+    NOW(),
+    NOW()
+);
+
+-- Create Agent Profile
+INSERT INTO Agents (user_id, license_number, agency_name, commission_rate, specialization, years_experience)
+SELECT user_id, 'MA-RE-TEST001', 'Demo Realty Group', 3.00, 'Residential', 5
+FROM Users WHERE email = 'agent@realestate.com';
+
+
+-- =====================================================
+-- CREATE DUMMY CLIENT USER
+-- Email: client@realestate.com
+-- Password: client123
+-- =====================================================
+
+-- Delete if exists
+DELETE FROM Clients WHERE user_id IN (SELECT user_id FROM Users WHERE email = 'client@realestate.com');
+DELETE FROM Users WHERE email = 'client@realestate.com';
+
+-- Create Client User
+INSERT INTO Users (
+    email, 
+    username,
+    password_hash, 
+    first_name, 
+    last_name, 
+    phone, 
+    user_type,
+    is_active,
+    is_superuser,
+    is_staff,
+    created_at,
+    updated_at,
+    date_joined
+) VALUES (
+    'client@realestate.com',
+    'client@realestate.com',
+    'pbkdf2_sha256$600000$CPty32rB9BreavI1JIWfSt$WUKKCDHVsnKf6Q6zdndkYDNfNZXmuyRGrOGlNJU/wew=',  -- password: client123
+    'Jane',
+    'Client',
+    '555-2001',
+    'client',
+    TRUE,
+    FALSE,
+    FALSE,
+    NOW(),
+    NOW(),
+    NOW()
+);
+
+-- Create Client Profile
+INSERT INTO Clients (user_id, preferred_contact_method, budget_min, budget_max, preferred_location, looking_for)
+SELECT user_id, 'email', 300000, 600000, 'Boston', 'buy'
+FROM Users WHERE email = 'client@realestate.com';
+
+
+-- =====================================================
+-- VERIFY ALL DEMO USERS CREATED
+-- =====================================================
+SELECT 
+    u.email,
+    u.first_name,
+    u.last_name,
+    u.user_type,
+    CASE 
+        WHEN u.user_type = 'admin' THEN 'admin123'
+        WHEN u.user_type = 'agent' THEN 'agent123'
+        WHEN u.user_type = 'client' THEN 'client123'
+    END as password,
+    u.is_active,
+    u.is_superuser
+FROM Users u
+WHERE u.email IN ('superuser@realestate.com', 'agent@realestate.com', 'client@realestate.com')
+ORDER BY u.user_type;
 
 -- Update PropertyImages table with your new image names
 UPDATE PropertyImages SET image_url = '/static/images/prop1_exterior.jpg' WHERE property_id = 1 AND is_primary = TRUE;
